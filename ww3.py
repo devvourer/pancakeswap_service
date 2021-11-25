@@ -27,7 +27,7 @@ class Bsc:
             self.balance = web3.eth.get_balance(address)
             self.nonce = web3.eth.get_transaction_count(self.address)
 
-        self.selfcontract = self._get_contract_token(pan_router_contract_address)
+        self.contract = self._get_contract_token(pan_router_contract_address)
 
     @staticmethod
     def _get_abi(address):
