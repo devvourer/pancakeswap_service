@@ -22,7 +22,7 @@ async def sell_token(request):
     data = await request.post()
     bsc = Bsc(address=data['address'], private_key=data['private_key'])
 
-    response = Bsc.sell_token(data['contract_id'], data['amount'])
+    response = Bsc.sell_token(data['contract_id'], data['amount'], data['gas_price'])
     return web.json_response({'result': response})
 
 
@@ -31,7 +31,7 @@ async def buy_token(request):
     data = await request.post()
     bsc = Bsc(address=data['address'], private_key=data['private_key'])
 
-    response = Bsc.buy_token(data['token_to_buy'], data['amount'])
+    response = Bsc.buy_token(data['token_to_buy'], data['amount'], data['gas_price'])
     return web.json_response({'result': response})
 
 

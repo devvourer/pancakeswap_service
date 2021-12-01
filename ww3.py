@@ -4,6 +4,7 @@ import time
 
 from utils import is_same_address
 from web3 import Web3
+from aiohttp import web_response
 
 bsc = "https://bsc-dataseed.binance.org/"
 web3 = Web3(Web3.HTTPProvider(bsc))
@@ -51,11 +52,11 @@ class Bsc:
             fee = 3000
 
         weth = self.contract.functions.WETH().call()
+        print(weth)
         price = self.contract.functions.getAmountsOut(
             qty,
-            [weth, token1]
+            [token1, weth]
         ).call()[-1]
-
         return price
 
     def _get_contract_token(self, address: str):
@@ -64,7 +65,7 @@ class Bsc:
         sell_token_contract = web3.eth.contract(contract_address, abi=abi)
         return sell_token_contract
 
-    def sell_token(self, contract_id, amount):
+    def sell_token(self, contract_id, amount, gas_price):
         sell_token_contract = self._get_contract_token(contract_id)
         token_value = web3.toWei(amount, 'ether')
         # token_value2 = web3.fromWei(amount, 'ether')
@@ -74,7 +75,7 @@ class Bsc:
             pan_router_contract_address, self.balance
         ).buildTransaction({
             'from': self.address,
-            'gasPrice': web3.toWei('5', 'gwei'),
+            'gasPrice': gas_price,
             'nonce': self.nonce,
         })
 
@@ -90,7 +91,7 @@ class Bsc:
             (int(time.time()) + 1000000)
         ).buildTransaction({
             'from': self.address,
-            'gasPrice': web3.toWei('5', 'gwei'),
+            'gasPrice': web3.toWei(gas_price, 'ether'),
             'nonce': self.nonce,
         })
 
@@ -99,7 +100,7 @@ class Bsc:
 
         return tx_token
 
-    def buy_token(self, token_to_buy, amount):
+    def buy_token(self, token_to_buy, amount, gas_price):
         token_to_buy = web3.toChecksumAddress(token_to_buy)
         pancakeswap2_txn = self.contract.functions.swapExactETHForTokens(
             0,
@@ -110,7 +111,7 @@ class Bsc:
             'from': self.address,
             'value': web3.toWei(amount, 'ether'),
             'gas': 250000,
-            'gasPrice': web3.toWei('5', 'gwei'),
+            'gasPrice': web3.toWei(gas_price, 'ether'),
             'nonce': self.nonce
         })
         signed_txn = web3.eth.account.sign_transaction(pancakeswap2_txn, private_key=self.private_key)
@@ -154,8 +155,6 @@ class Bsc:
 
         return tx_token
 
-
-
     def remove_liquidity(self,  sender_address, token_address, liquid_contract_address):
         wbnb = web3.toChecksumAddress("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c")  # WBNB
 
@@ -194,9 +193,12 @@ class Bsc:
 
     def get_currency(self, token_address):
         currency = Web3.toChecksumAddress(token_address)
-        currency_rate = self._get_price_input(BNB, currency, 1)
-        busd_rate = self._get_price_input(BNB, BUSD, 1)
-        conversion = ((1 / currency_rate) * (busd_rate / 1))
+        print(currency)
+        currency_rate = self._get_price_input(currency, currency, 1 * 10 ** 18)
+        busd_rate = self._get_price_input(BUSD, BUSD, 1 * 10 ** 18)
+        print(currency_rate)
+        print(busd_rate)
+        conversion = ((1 / currency_rate) * (busd_rate / 10 ** 18))w
         return f'{conversion}'
 
 
