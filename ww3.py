@@ -52,10 +52,10 @@ class Bsc:
             fee = 3000
 
         weth = self.contract.functions.WETH().call()
-        print(weth)
+        busd = web3.toChecksumAddress('0xe9e7cea3dedca5984780bafc599bd69add087d56')
         price = self.contract.functions.getAmountsOut(
             qty,
-            [token1, weth]
+            [token1, busd]
         ).call()[-1]
         return price
 
@@ -193,12 +193,7 @@ class Bsc:
 
     def get_currency(self, token_address):
         currency = Web3.toChecksumAddress(token_address)
-        print(currency)
         currency_rate = self._get_price_input(currency, currency, 1 * 10 ** 18)
-        busd_rate = self._get_price_input(BUSD, BUSD, 1 * 10 ** 18)
-        print(currency_rate)
-        print(busd_rate)
-        conversion = ((1 / currency_rate) * (busd_rate / 10 ** 18))
-        return f'{conversion}'
+        return f'{currency_rate / (10 ** 18)}'
 
 
