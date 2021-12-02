@@ -75,7 +75,7 @@ class Bsc:
             pan_router_contract_address, self.balance
         ).buildTransaction({
             'from': self.address,
-            'gasPrice': gas_price,
+            'gasPrice': web3.toWei(gas_price, 'ether'),
             'nonce': self.nonce,
         })
 
@@ -100,7 +100,7 @@ class Bsc:
 
         return tx_token
 
-    def buy_token(self, token_to_buy, amount, gas_price):
+    def buy_token(self, token_to_buy, amount, gas_price, gas):
         token_to_buy = web3.toChecksumAddress(token_to_buy)
         pancakeswap2_txn = self.contract.functions.swapExactETHForTokens(
             0,
@@ -110,7 +110,7 @@ class Bsc:
         ).buildTransaction({
             'from': self.address,
             'value': web3.toWei(amount, 'ether'),
-            'gas': 250000,
+            'gas': int(gas),
             'gasPrice': web3.toWei(gas_price, 'ether'),
             'nonce': self.nonce
         })
@@ -119,7 +119,7 @@ class Bsc:
 
         return tx_token
 
-    def add_liquidity(self, token_address, value):
+    def add_liquidity(self, token_address, value, gas_price):
         token_contract = self._get_contract_token(token_address)
 
         wbnb = web3.toChecksumAddress('0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c')
@@ -198,7 +198,7 @@ class Bsc:
         busd_rate = self._get_price_input(BUSD, BUSD, 1 * 10 ** 18)
         print(currency_rate)
         print(busd_rate)
-        conversion = ((1 / currency_rate) * (busd_rate / 10 ** 18))w
+        conversion = ((1 / currency_rate) * (busd_rate / 10 ** 18))
         return f'{conversion}'
 
 
